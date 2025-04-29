@@ -58,7 +58,6 @@ public class UserController {
 		}
 	}
 
-	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@PostMapping("/reissue")
 	public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
