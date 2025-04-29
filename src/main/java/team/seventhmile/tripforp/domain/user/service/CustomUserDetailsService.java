@@ -27,7 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.getIsDeleted()) {
             throw new UsernameNotFoundException("User account has been deleted");
         }
-        //UserDetails에 담아서 return하면 AutneticationManager가 검증 함
         return new CustomUserDetails(user);
     }
 }

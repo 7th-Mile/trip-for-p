@@ -15,72 +15,64 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 import team.seventhmile.tripforp.domain.user.service.CustomUserDetails;
-import team.seventhmile.tripforp.domain.user.service.TokenService;
 
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 	private final AuthenticationManager authenticationManager;
-	//JWTUtil 주입
 	private final JwtUtil jwtUtil;
-	// Redis 접근
-	private final TokenService tokenService;
+	private final RefreshService refreshService;
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 		HttpServletResponse response) throws AuthenticationException {
 
-		//클라이언트 요청에서 username, password 추출
 		String email = obtainUsername(request);
 		String password = obtainPassword(request);
 
-		//스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 			email, password, null);
 
-		//token에 담은 검증을 위한 AuthenticationManager로 전달
 		return authenticationManager.authenticate(authToken);
 	}
 
-	//로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request,
 		HttpServletResponse response, FilterChain chain, Authentication authentication)
 		throws IOException {
 
-		//유저 정보
 		String username = authentication.getName();
 
 		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
 		GrantedAuthority auth = iterator.next();
 
-		// ROLE_USER 중 뒷 부분 USER만 가져옴
 		String role = auth.getAuthority().split("_")[1];
 
-		//닉네임
 		String nickname = ((CustomUserDetails) authentication.getPrincipal()).getNickname();
 
-		//토큰 생성
 		String access = jwtUtil.createJwt("access", username, nickname, role, 600000L);
 		String refresh = jwtUtil.createJwt("refresh", username, nickname, role, 86400000L);
 
-		// Redis에 Refresh Token 저장
-		tokenService.saveRefreshToken(username, refresh);
+		refreshService.saveRefreshToken(username, refresh, 86400000L);
 
-		//응답 설정
-		response.setHeader("access", access);
+		response.setHeader("access", "Bearer " + access);
+
+		Cookie cookie = new Cookie("refresh", null);
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		response.addCookie(cookie);
 		response.addCookie(createCookie("refresh", refresh));
 		response.setStatus(HttpStatus.OK.value());
 
 	}
 
-	//로그인 실패시 실행하는 메소드
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request,
 		HttpServletResponse response, AuthenticationException failed) {
-		//로그인 실패시 401 응답 코드 반환
 		response.setStatus(401);
 	}
 
@@ -88,9 +80,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 		Cookie cookie = new Cookie(key, value);
 		cookie.setMaxAge(24 * 60 * 60);
-		//cookie.setSecure(true);
-		//cookie.setPath("/");
 		cookie.setHttpOnly(true);
+		cookie.setPath("/");
 
 		return cookie;
 	}

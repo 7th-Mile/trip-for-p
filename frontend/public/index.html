@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="ko">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title>Trip For P</title>
+    <meta name="naver-site-verification" content="ae2f35127f44c769fe43a4e98bbf9ccaceb38e75" />
+
+    <meta name="description" content="MBTI P들도 간편하게 여행을 계획해보세요. 인기 지역, 방문지 추천과 최적의 동선을 제공하는 여행 계획 플랫폼입니다.">
+    <meta name="keywords" content="트립포피, Trip For P, 여행, 계획, 플래너, AI, 여행코스">
+
+    <meta property="og:title" content="트립포피: P들을 위한 여행 계획 플랫폼">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tripforp.co.kr">
+    <meta property="og:image" content="https://tripforp.co.kr/og-image.png">
+    <meta property="og:description" content="MBTI P들도 간편하게 여행을 계획해보세요. 인기 지역, 방문지 추천과 최적의 동선을 제공하는 여행 계획 플랫폼입니다.">
+    <meta property="og:site_name" content="트립포피">
+    <meta property="og:locale" content="ko_KR">
+
+    <link rel="icon" type="image/png" sizes="100x100" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <title>트립포피</title>
     <style>
       * {
         box-sizing: border-box;
@@ -14,22 +30,39 @@
         font-family: "Pretendard Variable", sans-serif;
         list-style: none;
       }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: background 0.3s ease;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
       #app {
         display: flex;
         flex-direction: column;
         position: relative;
-        height: 100vh;
         align-items: center;
         overflow-x: hidden;
       }
 
       a {
-        color: inherit; /* 부모 요소의 색상을 상속 */
-        text-decoration: none; /* 밑줄 제거 */
-        cursor: pointer; /* 마우스 오버 시 포인터 커서 유지 */
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
       }
 
-      /* 모든 상태에서 동일한 스타일 유지 */
       a:hover,
       a:visited,
       a:active,

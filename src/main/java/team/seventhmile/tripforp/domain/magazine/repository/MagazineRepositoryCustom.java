@@ -2,12 +2,10 @@ package team.seventhmile.tripforp.domain.magazine.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import team.seventhmile.tripforp.domain.magazine.entity.Magazine;
+import team.seventhmile.tripforp.domain.magazine.dto.GetMagazinesResponse;
 
 public interface MagazineRepositoryCustom {
 
-	Page<Magazine> getMagazinePosts(Pageable pageable);
-
-	Page<Magazine> getMagazineKeywordContaining(String keyword, Pageable pageable);
+	Page<GetMagazinesResponse> getMagazineKeywordContaining(String keyword, Pageable pageable);
 
 }

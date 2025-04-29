@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.VERSION }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version from git hash
+        run: echo "VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Create application.yml from GitHub Secrets
+        run: |
+          mkdir -p src/main/resources/
+          echo "${{ secrets.APPLICATION_YML }}" | tee src/main/resources/application.yml
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Server Image
+        run: |
+          docker build -t ${{ secrets.SERVER_IMAGE_TAG }}:${{ env.VERSION }} .
+          docker push ${{ secrets.SERVER_IMAGE_TAG }}:${{ env.VERSION }}
+
+      - name: Build and Push Client Image
+        run: |
+          docker build -t ${{ secrets.CLIENT_IMAGE_TAG }}:${{ env.VERSION }} ./frontend
+          docker push ${{ secrets.CLIENT_IMAGE_TAG }}:${{ env.VERSION }}
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH to deploy server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.REMOTE_SERVER_IP }}
+          username: ${{ secrets.REMOTE_SERVER_USER }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          script: |
+            export VERSION=${{ needs.build.outputs.version }}
+            sh deploy.sh

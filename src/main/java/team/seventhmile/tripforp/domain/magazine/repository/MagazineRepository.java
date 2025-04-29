@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import team.seventhmile.tripforp.domain.magazine.entity.Magazine;
 
 public interface MagazineRepository extends JpaRepository<Magazine, Long>,
-	MagazineRepositoryCustom {
+    MagazineRepositoryCustom {
 
-	Page<Magazine> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<Magazine> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
 

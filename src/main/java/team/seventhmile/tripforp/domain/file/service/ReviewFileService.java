@@ -6,19 +6,16 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import team.seventhmile.tripforp.domain.file.entity.MagazineFile;
 import team.seventhmile.tripforp.domain.file.entity.ReviewFile;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewFileService {
 
-	@Autowired
-	private AmazonS3 s3Client;
+	private final AmazonS3 s3Client;
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 

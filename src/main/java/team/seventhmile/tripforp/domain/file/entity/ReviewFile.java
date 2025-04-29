@@ -13,8 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import team.seventhmile.tripforp.domain.magazine.entity.Magazine;
-import team.seventhmile.tripforp.domain.review_post.entity.ReviewPost;
+import team.seventhmile.tripforp.domain.reviewPost.entity.ReviewPost;
 
 @Entity
 @Table(name = "review_files")

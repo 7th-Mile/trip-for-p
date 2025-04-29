@@ -15,19 +15,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import team.seventhmile.tripforp.domain.user.service.TokenService;
+import team.seventhmile.tripforp.domain.refresh.service.RefreshService;
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
 
 	private SecretKey secretKey;
-	private final TokenService tokenService;
+	private final RefreshService refreshService;
 
 	@Value("${jwt.secret}")
 	private String secret;
 
-	// 생성자에서 SecretKey 및 TokenService 주입
 	@PostConstruct
 	public void init() {
 		this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
@@ -59,12 +58,19 @@ public class JwtUtil {
 	}
 
 	public Boolean isExpired(String token) {
-
-		return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
-			.getExpiration().before(new Date());
+		try {
+			return Jwts.parser()
+				.verifyWith(secretKey)
+				.build()
+				.parseSignedClaims(token)
+				.getPayload()
+				.getExpiration()
+				.before(new Date());
+		} catch (ExpiredJwtException e) {
+			return true;
+		}
 	}
 
-	// JWT 토큰 발급
 	public String createJwt(String category, String username, String nickname, String role, Long expiredMs) {
 
 		return Jwts.builder()
@@ -78,43 +84,35 @@ public class JwtUtil {
 			.compact();
 	}
 
-	// Access 토큰 재발행
 	public ResponseEntity<?> reissueToken(HttpServletRequest request,
 		HttpServletResponse response) {
-		// 리프레시 토큰 가져오기
 		String refresh = getRefreshTokenFromCookie(request);
 		if (refresh == null) {
 			return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);
 		}
 
-		// 리프레시 토큰 만료 확인
 		try {
 			isExpired(refresh);
 		} catch (ExpiredJwtException e) {
 			return new ResponseEntity<>("refresh token expired", HttpStatus.BAD_REQUEST);
 		}
 
-		// 사용자 정보 가져오기
 		String username = getUsername(refresh);
 		String role = getRole(refresh);
 		String nickname = getNickname(refresh);
 
-		// 리프레시 토큰이 유효한지 확인
-		String redisRefreshToken = tokenService.getRefreshToken(username);
+		String refreshToken = refreshService.getRefreshToken(username);
 
-		if (!refresh.equals(redisRefreshToken)) {
+		if (!refresh.equals(refreshToken)) {
 			return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
 		}
 
-		// 새로운 JWT 생성
 		String newAccess = createJwt("access", username, nickname, role, 600000L);
 		String newRefresh = createJwt("refresh", username, nickname, role, 86400000L);
 
-		// Redis에 새로운 Refresh Token 저장 (기존 토큰 대체)
-		tokenService.saveRefreshToken(username, newRefresh);
+		refreshService.saveRefreshToken(username, newRefresh, 86400000L);
 
-		// 응답 설정
-		response.setHeader("access", newAccess);
+		response.setHeader("access", "Bearer " + newAccess);
 		response.addCookie(createCookie("refresh", newRefresh));
 
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -136,8 +134,8 @@ public class JwtUtil {
 		Cookie cookie = new Cookie(key, value);
 		cookie.setMaxAge(24 * 60 * 60);
 		cookie.setHttpOnly(true);
-		// cookie.setSecure(true); // HTTPS를 사용하는 경우에만 주석 해제
-		// cookie.setPath("/"); // 필요에 따라 경로를 설정
+		cookie.setPath("/");
+
 		return cookie;
 	}
 

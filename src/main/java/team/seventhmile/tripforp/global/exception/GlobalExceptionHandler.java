@@ -2,18 +2,13 @@ package team.seventhmile.tripforp.global.exception;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException.Forbidden;
 import org.springframework.web.context.request.WebRequest;
 
 @RestControllerAdvice
@@ -90,15 +85,4 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(errorResponse, errorCode.getStatus());
     }
-
-    // 모든 예외를 처리하는 핸들러 추가
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
-//        ErrorResponse errorResponse = ErrorResponse.builder()
-//                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-//                .message("An unexpected error occurred")
-//                .path(request.getDescription(false))
-//                .build();
-//        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
 }

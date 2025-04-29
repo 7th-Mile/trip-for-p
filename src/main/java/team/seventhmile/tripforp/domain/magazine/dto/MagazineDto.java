@@ -35,7 +35,6 @@ public class MagazineDto {
 
 	private List<String> fileUrls;
 
-	// dto -> entity 변환
 	public Magazine convertToEntity(User user) {
 		return Magazine.builder()
 			.id(this.id)
@@ -48,7 +47,6 @@ public class MagazineDto {
 			.build();
 	}
 
-	// entity -> dto 변환
 	public static MagazineDto convertToDto(Magazine magazine) {
 		return MagazineDto.builder()
 			.id(magazine.getId())

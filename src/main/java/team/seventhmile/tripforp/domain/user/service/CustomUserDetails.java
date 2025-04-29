@@ -15,18 +15,6 @@ public class CustomUserDetails implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-
-//		Collection<GrantedAuthority> collection = new ArrayList<>();
-//
-//		collection.add(new GrantedAuthority() {
-//
-//			@Override
-//			public String getAuthority() {
-//
-//				return user.getRole().toString();
-//			}
-//		});
-
 		return Collections.<GrantedAuthority>singletonList(
 			new SimpleGrantedAuthority("ROLE_" + user.getRole().toString()));
 	}
@@ -37,14 +25,12 @@ public class CustomUserDetails implements UserDetails {
 		return user.getPassword();
 	}
 
-	// user email
 	@Override
 	public String getUsername() {
 
 		return user.getEmail();
 	}
 
-	// user nickname
 	public String getNickname() {
 
 		return user.getNickname();

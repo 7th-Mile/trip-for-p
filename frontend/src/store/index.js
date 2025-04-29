@@ -1,40 +1,23 @@
-import { createStore } from "vuex";
+import {createStore} from "vuex";
 import createPersistedState from 'vuex-persistedstate';
-import jwtDecoder from 'vue-jwt-decode';
-import {refreshTokenAPI} from "@/api";
-
-
 
 const store = createStore({
     state: {
         accessToken: null
     },
     getters: {
-        getAccessToken: function (state) {
+        getAccessToken: (state) => () => {
             return state.accessToken;
         },
-        isAccessTokenValid: function (state) {
+        isAccessTokenValid: (state) => () => {
             if (!state.accessToken) {
                 return false;
             }
-            try {
-                const decodedToken = jwtDecoder.decode(state.accessToken)
-                const currentTime = Date.now() / 1000;
-                if (decodedToken.exp > currentTime) {
-                    return true;
-                }
-                refreshTokenAPI().then(response => {
-                    const newToken = response.headers.access
-                    store.commit('setAccessToken', newToken);
-                });
-
-                return true;
-            } catch (error) {
-                console.log(error);
-                return false;
-            }
+            const decodedToken = decodeJwtToken(state.accessToken)
+            const currentTime = Date.now() / 1000;
+            return decodedToken.exp > currentTime;
         },
-        getNickname: function (state) {
+        getNickname: (state) => () => {
             if (!state.accessToken) {
                 return false;
             }
@@ -49,12 +32,12 @@ const store = createStore({
                 return false;
             }
         },
-        getRole: function (state) {
+        getRole: (state) => () => {
             if (!state.accessToken) {
                 return false;
             }
             try {
-                const decodedToken = jwtDecoder.decode(state.accessToken)
+                const decodedToken = decodeJwtToken(state.accessToken)
                 return decodedToken.role
             } catch (error) {
                 return false;

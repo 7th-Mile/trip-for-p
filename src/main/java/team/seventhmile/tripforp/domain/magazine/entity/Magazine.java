@@ -36,38 +36,30 @@ import team.seventhmile.tripforp.global.common.BaseEntity;
 @SuperBuilder
 public class Magazine extends BaseEntity {
 
-	// 게시글 id
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "magazine_post_id")
 	private Long id;
 
-	// 회원 id
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	// 제목
 	@Column(nullable = false)
 	private String title;
 
-	// 내용
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 
-	// 조회수
 	@Column(nullable = false)
 	@ColumnDefault("0")
 	private Integer views;
 
-	// 첨부 파일
 	@BatchSize(size = 100)
 	@OneToMany(mappedBy = "magazine", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<MagazineFile> files = new ArrayList<>();
 
-
-	// 수정 로직 (더티 체킹 방식)
 	public void update(String title, String content) {
 		validateField(title, "Title");
 		validateField(content, "Content");
@@ -76,7 +68,6 @@ public class Magazine extends BaseEntity {
 		this.content = content;
 	}
 
-	// 조회 수 증가 로직
 	public void incrementViews() {
 		this.views += 1;
 	}
@@ -90,7 +81,6 @@ public class Magazine extends BaseEntity {
 		this.files.clear();
 	}
 
-	// Not Null 예외 처리 로직
 	public static void validateField(String field, String fieldName) {
 		if (field == null || field.isEmpty()) {
 			throw new IllegalArgumentException(fieldName + "은(는) 필수 입력 항목입니다.");

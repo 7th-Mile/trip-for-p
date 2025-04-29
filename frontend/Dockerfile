@@ -7,9 +7,11 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# FE Run
-FROM nginx:latest
-COPY --from=build /app/dist /var/www/html/dist
-EXPOSE 80
+CMD ["tail", "-f", "/dev/null"]
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+## FE Run
+#FROM nginx:latest
+#COPY --from=build /app/dist /var/www/html/dist
+#EXPOSE 80
+#
+#ENTRYPOINT ["nginx", "-g", "daemon off;"]
