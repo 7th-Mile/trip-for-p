@@ -23,6 +23,11 @@ jobs:
           mkdir -p src/main/resources/
           echo "${{ secrets.APPLICATION_YML }}" | tee src/main/resources/application.yml
 
+      - name: Create .env.development from GitHub Secrets
+        run: |
+          mkdir -p frontend/
+          echo "${{ secrets.ENV_DEVELOPMENT }}" | tee frontend/.env.development
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
